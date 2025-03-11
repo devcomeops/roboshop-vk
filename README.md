@@ -1,2 +1,2 @@
-# roboshop
+# rooshop
 vk-rooshop
