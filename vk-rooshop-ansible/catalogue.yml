@@ -21,6 +21,10 @@
    hosts: catalogue
    become: true
    tasks: 
+
+     - name: Set prompt
+       ansible.builtin.shell: set-prompt Catalogue
+
      - name: Disable nodejs modules first
        ansible.builtin.dnf: dnf module disable nodejs -y
     

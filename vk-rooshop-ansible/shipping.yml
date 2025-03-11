@@ -21,6 +21,9 @@
   hosts: shipping
   become: true
   tasks:
+    - name: Set prompt
+      ansible.builtin.shell: set-prompt shipping
+    
     - name: Install Maven 
       ansible.builtin.dnf:
         name: maven

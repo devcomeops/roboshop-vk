@@ -14,6 +14,9 @@
    hosts: payment
    become: true
    tasks:
+     - name: Set prompt
+       ansible.builtin.shell: set-prompt payment
+
      - name: Install Python and required components
        ansible.builtin.dnf:
          name: "{{ item }}"

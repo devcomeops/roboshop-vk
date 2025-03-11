@@ -2,6 +2,9 @@
   hosts: rabbitmq
   become: true
   tasks: 
+    - name: Set prompt
+      ansible.builtin.shell: set-prompt rabbitmq
+     
     - name: Install rabbitmq-server on host
       ansible.builtin.dnf: 
         name: rabbitmq-server

@@ -2,6 +2,10 @@
    hosts: frontend
    become: true
    tasks: 
+
+     - name: Set prompt
+       ansible.builtin.shell: set-prompt frontend
+
      - name: Disable nginx modules first
        ansible.builtin.dnf: dnf module disable nginx -y
     

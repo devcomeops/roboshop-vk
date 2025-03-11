@@ -18,6 +18,10 @@
   hosts: dispatch
   become: true
   tasks: 
+
+    - name: Set prompt
+      ansible.builtin.shell: set-prompt Dispatch
+    
     - name: Install golang
       ansible.builtin.dnf:
         name: golang

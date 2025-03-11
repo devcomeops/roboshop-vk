@@ -16,6 +16,9 @@
    hosts: user
    become: true
    tasks: 
+     - name: Set prompt
+       ansible.builtin.shell: set-prompt cart
+       
      - name: Disable nodejs modules first
        ansible.builtin.dnf: dnf module disable nodejs -y
     

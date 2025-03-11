@@ -2,6 +2,9 @@
    hosts: mongodb
    become: true
    tasks: 
+     - name: Set prompt
+       ansible.builtin.shell: set-prompt mongodb
+
      - name: Install mongodb
        ansible.builtin.dnf: 
          name: mongodb-org
