@@ -1,0 +1,22 @@
+ - name: Install Mongodb on mongodb node
+   hosts: mongodb
+   become: true
+   tasks: 
+     - name: Install mongodb
+       ansible.builtin.dnf: 
+         name: mongodb-org
+         state: installed
+
+
+     - name: Replace  127.0.0.1 with 0.0.0.0
+       ansible.builtin.replace:
+         path: /etc/mongod.conf
+         regexp: '127.0.0.1'
+         replace: '0.0.0.0'        
+
+
+     - name: Start and Enable the mongodb service
+       ansible.builtin.service:
+         name: mongodb
+         state: started
+         enabled: yes 
