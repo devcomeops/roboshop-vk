@@ -1,0 +1,70 @@
+- name: Setup Dispatch host
+  hosts: 172.31.43.67
+  become: true
+  tasks: 
+
+    - name: Set prompt
+      ansible.builtin.shell: set-prompt Dispatch
+    
+    - name: Install golang
+      ansible.builtin.dnf:
+        name: golang
+        state: installed
+
+    - name: Add user roboshop
+      ansible.builtin.user:
+        name: roboshop
+
+    - name: Create directory /app
+      ansible.builtin.file:
+        path: /app
+        state: directory
+        owner: roboshop
+        group: roboshop
+        mode: '0755'
+
+    - name: Download dispatch
+      ansible.builtin.get_url:
+        url: https://roboshop-artifacts.s3.amazonaws.com/dispatch-v3.zip 
+        dest: /tmp/dispatch.zip
+
+    - name: Extract dispatch into /app
+      ansible.builtin.unarchive:
+        src: /tmp/dispatch.zip
+        dest: /app
+        remote_src: yes
+        owner: roboshop
+        group: roboshop  
+
+    - name: Initialize Go module
+      ansible.builtin.command: go mod init dispatch
+      args:
+        chdir: /app
+      become_user: roboshop
+
+    - name: Download dependencies
+      ansible.builtin.command: go get 
+      args:
+        chdir: /app
+      become_user: roboshop
+
+    - name: Build Dispatch application
+      ansible.builtin.command: go build
+      args:
+        chdir: /app
+      become_user: roboshop
+
+    - name: Copy dispatch.service file to /etc/systemd/system/
+      ansible.builtin.template:
+        src: dispatch.service
+        dest: /etc/systemd/system/dispatch.service
+
+    - name: Reload systemd daemon
+      ansible.builtin.command: systemctl daemon-reload
+
+    - name: Start and enable dispatch service
+      ansible.builtin.systemd_service:
+        name: dispatch
+        state: started
+        enabled: yes
+

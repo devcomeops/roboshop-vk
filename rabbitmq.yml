@@ -1,0 +1,42 @@
+- name: Setup RabbitMQ Host
+  hosts: 172.31.35.13
+  become: true
+  tasks:
+    - name: Set prompt
+      ansible.builtin.shell: set-prompt rabbitmq
+
+    - name: Copy rabbitmq.repo
+      ansible.builtin.template:
+        src: rabbitmq.repo
+        dest: /etc/yum.repos.d/rabbitmq.repo
+
+    - name: Install RabbitMQ Server
+      ansible.builtin.dnf:
+        name: rabbitmq-server
+        state: present
+
+    - name: Enable and start RabbitMQ service
+      ansible.builtin.systemd:
+        name: rabbitmq-server
+        state: started
+        enabled: yes
+
+    - name: Ensure RabbitMQ user 'roboshop' exists
+      ansible.builtin.command: rabbitmqctl add_user roboshop roboshop123
+        #      args:
+        # creates: /var/lib/rabbitmq/.erlang.cookie
+
+    - name: Set permissions for 'roboshop' user
+      ansible.builtin.command: rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*"
+
+    - name: Restart RabbitMQ service to apply changes
+      ansible.builtin.systemd:
+        name: rabbitmq-server
+        state: restarted
+        enabled: yes
+
+    - name: Check RabbitMQ service status
+      ansible.builtin.systemd:
+        name: rabbitmq-server
+        state: started
+

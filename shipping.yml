@@ -1,0 +1,98 @@
+- name: Configure Shipping Host
+  hosts: 172.31.47.146
+  become: true
+  tasks:
+
+    - name: Set prompt
+      ansible.builtin.shell: set-prompt shipping
+
+    - name: Install Maven
+      ansible.builtin.dnf:
+        name: maven
+        state: present
+
+    - name: Create a user 'roboshop' with a home directory
+      ansible.builtin.user:
+        name: roboshop
+        home: /home/roboshop
+        state: present
+        create_home: yes
+
+    - name: Ensure /app directory exists
+      ansible.builtin.file:
+        path: /app
+        state: directory
+        owner: roboshop
+        group: roboshop
+        mode: '0755'
+
+    - name: Copy shipping.service file to /etc/systemd/system/
+      ansible.builtin.copy:
+        src: shipping.service
+        dest: /etc/systemd/system/shipping.service
+        mode: '0644'
+
+    - name: Download shipping.zip
+      ansible.builtin.get_url:
+        url: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip
+        dest: /tmp/shipping.zip
+
+    - name: Extract shipping.zip into /app
+      ansible.builtin.unarchive:
+        src: /tmp/shipping.zip
+        dest: /app
+        remote_src: yes
+        owner: roboshop
+        group: roboshop
+
+    - name: Build the shipping application using Maven
+      ansible.builtin.command: mvn clean package
+      args:
+        chdir: /app
+      become_user: roboshop
+
+    - name: Move the generated JAR file
+      ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar
+      args:
+        chdir: /app
+
+    - name: Reload systemd daemon
+      ansible.builtin.command: systemctl daemon-reload
+
+    - name: Install MySQL client on the shipping host
+      ansible.builtin.dnf:
+        name: mysql
+        state: present
+
+    - name: Ensure /app/db directory exists
+      ansible.builtin.file:
+        path: /app/db
+        state: directory
+        owner: roboshop
+        group: roboshop
+        mode: '0755'
+
+    - name: Import MySQL Schema
+      ansible.builtin.command: "/usr/bin/mysql -h 172.31.32.141 -uroot -pRoboShop@1 < /app/db/schema.sql"
+      args:
+        executable: /bin/bash
+      ignore_errors: yes
+
+    - name: Import MySQL App User
+      ansible.builtin.command: "/usr/bin/mysql -h 172.31.32.141 -uroot -pRoboShop@1 < /app/db/app-user.sql"
+      args:
+        executable: /bin/bash
+      ignore_errors: yes
+
+    - name: Import MySQL Master Data
+      ansible.builtin.command: "/usr/bin/mysql -h 172.31.32.141 -uroot -pRoboShop@1 < /app/db/master-data.sql"
+      args:
+        executable: /bin/bash
+      ignore_errors: yes
+
+    - name: Start and enable the shipping service
+      ansible.builtin.systemd:
+        name: shipping.service
+        state: started
+        enabled: yes
+

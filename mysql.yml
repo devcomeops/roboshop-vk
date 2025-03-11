@@ -1,0 +1,33 @@
+#dnf install mysql-server -y
+#systemctl enable mysqld
+#systemctl start mysqld  
+#mysql_secure_installation --set-root-pass RoboShop@1
+
+ - name: install mysql-server
+   hosts: 172.31.32.141
+   become: true
+   tasks: 
+     - name: Set prompt
+       ansible.builtin.shell: set-prompt mysql
+
+     - name: Install mysql-server on mysql host
+       ansible.builtin.dnf:
+         name: mysql-server
+         state: installed
+
+     - name: Start the service
+       ansible.builtin.systemd:
+         name: mysqld
+         state: started
+         enabled: yes        
+
+           #  - name: Set MySQL root password
+           #  ansible.builtin.command: >
+           # mysql --user=root --execute="ALTER USER 'root'@'localhost' IDENTIFIED BY 'RoboShop@1';"
+           #  args:
+           #  creates: /root/.mysql-password-set
+
+
+     - name: Set mysql-server root --set-root-pass
+       ansible.builtin.command: mysql_secure_installation --set-root-pass RoboShop@1
+       
