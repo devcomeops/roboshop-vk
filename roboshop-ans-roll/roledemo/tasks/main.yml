@@ -1,0 +1,11 @@
+ - name: Hello World
+   ansible.builtin.debug: 
+     msg: Hello World
+
+ - name: Hello World
+   ansible.builtin.debug: 
+     msg:: URL - {{ URL }}     
+
+ - name: Hello World
+   ansible.builtin.debug: 
+     msg:: EXAMPLE - {{ EXAMPLE }}     
