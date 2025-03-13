@@ -51,3 +51,14 @@
          name: nginx
          state: started
          enabled: yes
+#ansible-playbook -i 172.31.38.240, -e ansible_user=ec2-user -e ansible_password=DevOps321 frontend.yml -e env=dev
+#
+#
+#env=dev variable is defined in nginx.conf file like below:
+#
+#
+#        location /api/catalogue/ { proxy_pass http://catalogue-{{ env }}.rdevopsb81.online:8080/; }
+#        location /api/user/ { proxy_pass http://user-{{ env }}.rdevopsb81.online:8080/; }
+#        location /api/cart/ { proxy_pass http://cart-{{ env }}.rdevopsb81.online:8080/; }
+#        location /api/shipping/ { proxy_pass http://shipping-{{ env }}.rdevopsb81.online:8080/; }
+#        location /api/payment/ { proxy_pass http://payment-{{ env }}.rdevopsb81.online:8080/; }
