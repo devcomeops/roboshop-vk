@@ -1,5 +1,5 @@
- - name: Disable nginx enable modules and install
-   hosts: 172.31.38.240
+ - name: Roboshop Project Set-Up ansible-playbook
+   hosts: all
    become: true
    roles:
      - "{{ app_name }}" 
