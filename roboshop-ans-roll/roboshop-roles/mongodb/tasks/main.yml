@@ -1,0 +1,30 @@
+     - name: Set prompt
+       ansible.builtin.shell: set-prompt {{ app-name}}- {{ env }}
+
+     - name: Copy mongo.repo file to repo root
+       ansible.builtin.template:
+         src: mongo.repo
+         dest: /etc/yum.repos.d/mongo.repo
+
+     - name: Install mongodb
+       ansible.builtin.dnf: 
+         name: mongodb-org
+         state: installed
+
+
+     - name: Replace  127.0.0.1 with 0.0.0.0
+       ansible.builtin.replace:
+         path: /etc/mongod.conf
+         regexp: '127.0.0.1'
+         replace: '0.0.0.0'        
+
+
+     - name: Start and Enable the mongodb service
+       ansible.builtin.systemd_service:
+         name: mongod
+         state: started
+         enabled: yes 
+
+
+# command to run is 
+# git pull; ansible-playbook -i mongodb-dev.devopspractice.info, -e ansible_user=ec2-user -e ansible_password=DevOps321 -e env=dev -e app_name=mongodb mongodb.yml

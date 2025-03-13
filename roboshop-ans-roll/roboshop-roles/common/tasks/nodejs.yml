@@ -1,0 +1,19 @@
+ - name: Disable nodejs modules first
+   ansible.builtin.command: dnf module disable nodejs -y
+
+ - name: Enable nodejs modules
+   ansible.builtin.command: dnf module enable nodejs:20 -y
+
+ - name: Install nodejs:20  
+   ansible.builtin.dnf:
+     name: nodejs
+     state: installed
+  
+ - name: Load Ap p Prerequisites
+   ansible.builtin.include.tasks:
+     file: app_prerequisites.yml
+
+ - name: Install npm on catalogue
+   ansible.builtin.command: npm install
+   args:
+     chdir: /app

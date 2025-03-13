@@ -1,5 +1,5 @@
      - name: Set prompt
-       ansible.builtin.shell: set-prompt frontend
+       ansible.builtin.shell: set-prompt {{ app-name}}- {{ env }}
 
      - name: Disable nginx modules first
        ansible.builtin.shell: dnf module disable nginx -y
@@ -15,9 +15,13 @@
 
      - name: Recursively remove directory
        ansible.builtin.file:
-         path: /usr/share/nginx/html/*
+         path: /usr/share/nginx/html
          state: absent
-
+     
+     - name:  create html directory
+       ansible.builtin.file:
+         path: /usr/share/nginx/html
+         state: directory    
 
      - name: Copy nginx.conf file to web root
        ansible.builtin.template:
@@ -25,26 +29,28 @@
          dest: /etc/nginx/nginx.conf
 
 
-           #   - name: Extract frontend-v3.zip into /usr/share/nginx/html
-           # ansible.builtin.unarchive:
-           # src: curl -o /tmp/frontend.zip https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip
-           # dest: /usr/share/nginx/html
-     - name: Download frontend-v3.zip
-       ansible.builtin.get_url:
-         url: https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip
-         dest: /tmp/frontend.zip
-
-     - name: Extract frontend-v3.zip into /usr/share/nginx/html
+     - name: Download and Extract frontend-v3.zip into /usr/share/nginx/html
        ansible.builtin.unarchive:
-         src:  /tmp/frontend.zip
-         dest: /usr/share/nginx/html
-         remote_src: yes      # remote_src: yes  
+       src:   https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip
+       dest: /usr/share/nginx/html
+       remote_src: yes
+
+#     - name: Download frontend-v3.zip
+#       ansible.builtin.get_url:
+#         url: https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip
+#         dest: /tmp/frontend.zip
+#
+#     - name: Extract frontend-v3.zip into /usr/share/nginx/html
+#       ansible.builtin.unarchive:
+#         src:  /tmp/frontend.zip
+#         dest: /usr/share/nginx/html
+#         remote_src: yes      # remote_src: yes  
    
 
      - name: Start the service
        ansible.builtin.service:
          name: nginx
-         state: started
+         state: restarted
          enabled: yes
 #ansible-playbook -i 172.31.38.240, -e ansible_user=ec2-user -e ansible_password=DevOps321 frontend.yml -e env=dev
 #
@@ -57,3 +63,7 @@
 #        location /api/cart/ { proxy_pass http://cart-{{ env }}.rdevopsb81.online:8080/; }
 #        location /api/shipping/ { proxy_pass http://shipping-{{ env }}.rdevopsb81.online:8080/; }
 #        location /api/payment/ { proxy_pass http://payment-{{ env }}.rdevopsb81.online:8080/; }
+
+
+# command to run is 
+# git pull; ansible-playbook -i frontend-dev.devopspractice.info, -e ansible_user=ec2-user -e ansible_password=DevOps321 -e env=dev -e app_name=frontend frontend.yml
