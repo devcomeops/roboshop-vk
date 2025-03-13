@@ -1,0 +1,5 @@
+ - name: Disable nginx enable modules and install
+   hosts: 172.31.38.240
+   become: true
+   roles:
+     - "{{ app_name }}" 
