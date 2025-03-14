@@ -2,7 +2,7 @@
        ansible.builtin.shell: set-prompt {{ app-name}}- {{ env }}
 
      - name: Copy mongo.repo file to repo root
-       ansible.builtin.template:
+       ansible.builtin.copy:
          src: mongo.repo
          dest: /etc/yum.repos.d/mongo.repo
 

@@ -1,0 +1,29 @@
+     - name: Set prompt
+       ansible.builtin.shell: set-prompt {{ app_name}}-{{ env }}
+
+     - name: Load NodeJS
+       ansible.builtin.include_role:
+         name: common
+         tasks_from: nodejs
+
+     - name: Install MySQL client on the shipping host
+       ansible.builtin.dnf:
+         name: mysql
+         state: present
+ 
+     - name: Import MySQL Schema
+       ansible.builtin.shell: mysql -h mysql-{{ env }}.chatgpt1.info -uroot -pRoboShop@1 < /app/db/{{ item }}.sql
+       loop:
+         - schema
+         - app-user
+         - master-data
+       
+     - name: Re-Start and enable the shipping service
+       ansible.builtin.systemd:
+         name: shipping.service
+         state: restarted
+         enabled: yes
+
+
+
+#app_name=shipping env=dev make         

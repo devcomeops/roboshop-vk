@@ -9,7 +9,7 @@
      name: nodejs
      state: installed
   
- - name: Load Ap p Prerequisites
+ - name: Load App Prerequisites
    ansible.builtin.include.tasks:
      file: app_prerequisites.yml
 
@@ -17,3 +17,7 @@
    ansible.builtin.command: npm install
    args:
      chdir: /app
+
+ - name: SystemD setup
+   ansible.builtin.include_tasks:
+     file: systemd_setup.yml   

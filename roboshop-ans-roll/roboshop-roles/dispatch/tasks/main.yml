@@ -1,0 +1,22 @@
+    - name: Set prompt
+      ansible.builtin.shell: set-prompt {{ app_name }}-{{ env }}
+
+
+    - name: Load golang
+      ansible.builtin.include_role:
+        name: common
+        tasks_from: golang  
+
+    - name: Extract dispatch into /app
+      ansible.builtin.unarchive:
+        src: /tmp/{{ app_name }}.zip
+        dest: /app
+        remote_src: yes
+
+    - name: Reload systemd daemon
+      ansible.builtin.command: systemctl daemon-reload
+
+    - name: Load App Prerequisites
+      ansible.builtin.include_tasks:
+        file: systemd_setup.yml
+

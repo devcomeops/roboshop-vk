@@ -1,0 +1,26 @@
+    - name: Install golang
+      ansible.builtin.dnf:
+        name: golang
+        state: installed
+
+    - name: Install golang requirements on dispatch host
+      ansible.builtin.pip:
+        requirements: app_prerequisites.yml
+    
+    - name: Initialize Go module
+      ansible.builtin.command: go mod init dispatch
+      args:
+        chdir: /app
+      become_user: roboshop
+
+    - name: Download dependencies
+      ansible.builtin.command: go get 
+      args:
+        chdir: /app
+      become_user: roboshop
+
+    - name: Build Dispatch application
+      ansible.builtin.command: go build
+      args:
+        chdir: /app
+      become_user: roboshop           

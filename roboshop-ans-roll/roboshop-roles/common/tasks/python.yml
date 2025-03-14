@@ -1,0 +1,23 @@
+     - name: Install Python and required components
+       ansible.builtin.dnf:
+         name: "{{ item }}"
+         state: installed       
+       loop:
+         - python3
+         - gcc
+         - python3-devel
+         - python3-pip
+
+     - name: Load App Prerequisites
+       ansible.builtin.include_tasks:
+         file: app_prerequisites.yml    
+
+
+     - name: Install Python requirements on payment host
+       ansible.builtin.pip:
+         requirements: /app/requirements.txt
+         executable: pip3
+
+     - name: SystemD Set-Up
+       ansible.builtin.include_tasks:
+         file: systemd_setup.yml    
