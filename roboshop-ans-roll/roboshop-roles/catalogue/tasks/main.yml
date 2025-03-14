@@ -17,16 +17,12 @@
          name: mongodb-mongosh
          state: installed   
 
-
-     - name: Reload service daemon-reload, in all cases
-       ansible.builtin.command: systemctl daemon-reload
-         
-   
+  
      - name: Load Master Data 
-       ansible.builtin.shell: mongosh --host mongodb-{{ app-name }}.devopspractice.info </app/db/master-data.js
+       ansible.builtin.shell: mongosh --host mongodb-{{ env }}.devopspractice.info </app/db/master-data.js
 
      - name: Start the service
        ansible.builtin.systemd_service:
-         name: catalogue.service
+         name: catalogue
          state: restarted
          enabled: yes

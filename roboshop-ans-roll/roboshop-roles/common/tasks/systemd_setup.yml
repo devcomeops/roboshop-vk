@@ -10,6 +10,4 @@
          enabled: yes
          deaemon_reload: yes
 
-     - name: Load App Prerequisites
-       ansible.builtin.include_tasks:
-          file: systemd_setup.yml
+
