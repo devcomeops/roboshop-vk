@@ -1,0 +1,52 @@
+- name: Add user roboshop
+  ansible.builtin.user:
+    name: roboshop
+    state: present
+- name: Copy file to web root
+  ansible.builtin.template:
+    src: "{{ app_name }}.service"
+    dest: /etc/systemd/system/{{ app_name}}.service
+- name: Delete /app directory
+  ansible.builtin.file:
+    path: /app
+    state: absent  
+- name: Create /app directory
+  ansible.builtin.file:
+    path: /app
+    state: directory
+    owner: roboshop
+    group: roboshop
+    mode: "0755"
+  become: yes
+
+- name: Extract dispatch into /app
+  ansible.builtin.unarchive:
+    src: https://roboshop-artifacts.s3.amazonaws.com/{{ app_name }}-v3.zip
+    dest: /app
+    remote_src: yes
+  become: yes
+
+- name: Initialize Go module
+  ansible.builtin.command: go mod init dispatch
+  args:
+    chdir: /app
+  become: yes
+
+- name: Download dependencies
+  ansible.builtin.command: go get
+  args:
+    chdir: /app
+  become: yes
+
+- name: Build Dispatch application
+  ansible.builtin.command: go build
+  args:
+    chdir: /app
+  become: yes
+
+- name: Start the service
+  ansible.builtin.systemd_service:
+    name: "{{ app_name}}.service"
+    state: restarted
+    enabled: yes
+    daemon_reload: yes    

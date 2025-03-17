@@ -1,0 +1,5 @@
+ - name: Roboshop Project Set-Up ansible-playbook
+   hosts: all
+   become: true
+   roles:
+     - "{{ app_name }}" 

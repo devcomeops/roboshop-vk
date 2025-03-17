@@ -1,0 +1,33 @@
+     - name: Set prompt
+       ansible.builtin.shell: set-prompt {{ app_name}}-{{ env }}
+
+     - name: Load NodeJS
+       ansible.builtin.include_role:
+         name: common
+         tasks_from: nodejs
+    
+     - name: Copy mongo.repo file to repo root
+       ansible.builtin.copy:
+         src: mongo.repo
+         dest: /etc/yum.repos.d/mongo.repo
+
+         
+     - name: Install mongodb-mongosh
+       ansible.builtin.dnf: 
+         name: mongodb-mongosh
+         state: installed   
+
+
+     - name: Load Master Data 
+       ansible.builtin.shell: mongosh --host mongodb-{{ env }}.chatgpt1.info </app/db/master-data.js
+
+     - name: Start the service
+       ansible.builtin.systemd_service:
+         name: catalogue 
+         state: restarted
+         enabled: yes
+         #     - name: Restart Catalogue Service
+         #       ansible.builtin.systemd_service:
+         #  name: catalogue
+         #   state: restarted               
+         #enabled: yes  
